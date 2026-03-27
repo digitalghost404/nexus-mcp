@@ -267,7 +267,7 @@ try {
 // ── note ─────────────────────────────────────────────────────────────────────
 console.log(Y("\nnote"));
 try {
-  const res = await client.tool("note", { message: "nexus-mcp test note" });
+  const res = await client.tool("note", { project: "nexus", message: "nexus-mcp test note" });
   const text = getText(res);
   assert(
     !isError(res),
@@ -278,18 +278,19 @@ try {
   assert(false, "note: saves a note without error", e.message);
 }
 
-// ── resume (no project — outside tracked dir → error) ────────────────────────
+// ── resume (no project — required param missing → validation error) ──────────
 console.log(Y("\nresume (no project)"));
 try {
   const res = await client.tool("resume");
-  const text = getText(res);
+  // MCP SDK may return error in res.error or as isError in result content
+  const hasError = !!(res?.error || res?.result?.isError);
   assert(
-    isError(res) && text.includes("project not found"),
-    "resume(no project): errors when not in a tracked project dir",
-    text.slice(0, 100)
+    hasError,
+    "resume(no project): rejects when project omitted",
+    res?.error?.message?.slice(0, 100) || getText(res).slice(0, 100) || "no error found"
   );
 } catch (e) {
-  assert(false, "resume(no project): errors when not in a tracked project dir", e.message);
+  assert(false, "resume(no project): rejects when project omitted", e.message);
 }
 
 // ── resume (with project name) ───────────────────────────────────────────────

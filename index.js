@@ -15,9 +15,9 @@ const TIMEOUT_MS = 30_000;
 
 // ─── Helper: run nexus command ───────────────────────────────────────────────
 
-function runNexus(args) {
+function runNexus(args, opts = {}) {
   return new Promise((resolve) => {
-    execFile(NEXUS_BIN, args, { timeout: TIMEOUT_MS }, (err, stdout, stderr) => {
+    execFile(NEXUS_BIN, args, { timeout: TIMEOUT_MS, ...opts }, (err, stdout, stderr) => {
       if (err) {
         // Binary not found
         if (err.code === "ENOENT") {
@@ -54,9 +54,20 @@ function toContent(result) {
   };
 }
 
-async function nexusTool(args) {
-  const result = await runNexus(args);
+async function nexusTool(args, opts = {}) {
+  const result = await runNexus(args, opts);
   return toContent(result);
+}
+
+/**
+ * Resolve a project name to its filesystem path via `nexus show`.
+ * Returns the path string, or null if parsing fails.
+ */
+async function resolveProjectPath(project) {
+  const result = await runNexus(["show", project]);
+  if (result.isError) return null;
+  const match = result.text.match(/Path:\s+(.+)/);
+  return match ? match[1].trim() : null;
 }
 
 // ─── Server ──────────────────────────────────────────────────────────────────
@@ -79,21 +90,29 @@ server.tool(
 // 2. resume — pick up where you left off
 server.tool(
   "resume",
-  "Show last session with commits, files changed, and uncommitted changes",
-  { project: z.string().optional().describe("Project name (optional, uses cwd if omitted)") },
-  async ({ project }) => {
-    const args = ["resume"];
-    if (project) args.push(project);
-    return nexusTool(args);
-  }
+  "Show last session with commits, files changed, and uncommitted changes. Project name is required because the MCP server cannot detect the user's working directory.",
+  { project: z.string().describe("Project name") },
+  async ({ project }) => nexusTool(["resume", project])
 );
 
 // 3. note — save a note
 server.tool(
   "note",
-  "Save a note to the current project context for future sessions",
-  { message: z.string().describe("Note content to save") },
-  async ({ message }) => nexusTool(["note", message])
+  "Save a note to a project's context for future sessions. Project name is required because the MCP server cannot detect the user's working directory.",
+  {
+    project: z.string().describe("Project name to attach the note to"),
+    message: z.string().describe("Note content to save"),
+  },
+  async ({ project, message }) => {
+    const projectPath = await resolveProjectPath(project);
+    if (!projectPath) {
+      return toContent({
+        isError: true,
+        text: `Could not resolve path for project "${project}". Check the name with the 'projects' tool.`,
+      });
+    }
+    return nexusTool(["note", message], { cwd: projectPath });
+  }
 );
 
 // 4. search — full-text search
