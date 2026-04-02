@@ -271,6 +271,9 @@ server.tool(
   }
 );
 
+server.setResourceRequestHandlers();
+server.setPromptRequestHandlers();
+
 // ─── Start ───────────────────────────────────────────────────────────────────
 
 const transport = new StdioServerTransport();
