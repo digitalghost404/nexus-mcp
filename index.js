@@ -186,7 +186,7 @@ server.tool(
 // 9. sessions — session history
 server.tool(
   "sessions",
-  "List Claude Code session history with filtering options",
+  "List OpenCode session history with filtering options",
   {
     project: z.string().optional().describe("Filter by project name"),
     since: z.string().optional().describe("Show sessions since duration (e.g. '7d', '24h')"),

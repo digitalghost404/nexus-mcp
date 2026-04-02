@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Wrap the `nexus` CLI binary as an MCP server so Claude Code gets native tool access to cross-session memory without Bash permissions for every subcommand.
+Wrap the `nexus` CLI binary as an MCP server so OpenCode gets native tool access to cross-session memory without Bash permissions for every subcommand.
 
 ## Architecture
 
