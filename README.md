@@ -1,6 +1,6 @@
 # nexus-mcp
 
-MCP server that wraps the [nexus](https://github.com/digitalghost404/nexus) CLI, giving Claude Code cross-session memory and project context tracking.
+MCP server that wraps the [nexus](https://github.com/digitalghost404/nexus) CLI, giving OpenCode cross-session memory and project context tracking.
 
 ## Tools
 
@@ -30,7 +30,7 @@ Requires the `nexus` binary on PATH (or set `NEXUS_BIN` env variable).
 npm start
 ```
 
-Configure in Claude Code MCP settings:
+Configure in OpenCode MCP settings:
 
 ```json
 {

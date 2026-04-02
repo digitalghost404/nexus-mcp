@@ -186,7 +186,7 @@ server.tool(
 // 9. sessions — session history
 server.tool(
   "sessions",
-  "List Claude Code session history with filtering options",
+  "List OpenCode session history with filtering options",
   {
     project: z.string().optional().describe("Filter by project name"),
     since: z.string().optional().describe("Show sessions since duration (e.g. '7d', '24h')"),
@@ -199,6 +199,74 @@ server.tool(
     if (since) args.push("--since", since);
     if (today) args.push("--today");
     if (tag) args.push("--tag", tag);
+    return nexusTool(args);
+  }
+);
+
+// 10. diff — summarize changes across sessions
+server.tool(
+  "diff",
+  "Summarize changes (commits, files changed) across sessions in a time window",
+  {
+    project: z.string().optional().describe("Project name to filter by"),
+    since: z.string().optional().describe("Time window (e.g. '7d', '24h', '1m')"),
+  },
+  async ({ project, since }) => {
+    const args = ["diff"];
+    if (project) args.push(project);
+    if (since) args.push("--since", since);
+    return nexusTool(args);
+  }
+);
+
+// 11. streak — show coding streak
+server.tool(
+  "streak",
+  "Show consecutive days with sessions, plus weekly activity bars",
+  {},
+  async () => nexusTool(["streak"])
+);
+
+// 12. stale — list stale branches and dirty projects
+server.tool(
+  "stale",
+  "List stale branches and dirty projects. Use --cleanup for interactive cleanup.",
+  {
+    cleanup: z.boolean().optional().describe("Enable interactive branch cleanup"),
+  },
+  async ({ cleanup }) => {
+    const args = ["stale"];
+    if (cleanup) args.push("--cleanup");
+    return nexusTool(args);
+  }
+);
+
+// 13. tag — add user tag to a session
+server.tool(
+  "tag",
+  "Add a user tag to a session. Without session ID, tags the latest session.",
+  {
+    label: z.string().describe("Tag label to add"),
+    sessionId: z.string().optional().describe("Session ID to tag"),
+  },
+  async ({ label, sessionId }) => {
+    const args = ["tag"];
+    if (sessionId) args.push(sessionId);
+    args.push(label);
+    return nexusTool(args);
+  }
+);
+
+// 14. deps — scan for outdated dependencies
+server.tool(
+  "deps",
+  "Scan tracked projects for outdated Go, npm, and pip dependencies.",
+  {
+    project: z.string().optional().describe("Project to check"),
+  },
+  async ({ project }) => {
+    const args = ["deps"];
+    if (project) args.push("--project", project);
     return nexusTool(args);
   }
 );

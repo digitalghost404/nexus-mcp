@@ -148,6 +148,8 @@ try {
   const toolNames = tools.map((t) => t.name).sort();
   const expected = [
     "context",
+    "deps",
+    "diff",
     "note",
     "projects",
     "report",
@@ -155,15 +157,18 @@ try {
     "search",
     "sessions",
     "show",
+    "stale",
+    "streak",
+    "tag",
     "where",
   ];
   assert(
     JSON.stringify(toolNames) === JSON.stringify(expected),
-    "tools/list: all 9 tools registered",
+    "tools/list: all 14 tools registered",
     `got: [${toolNames.join(", ")}]`
   );
 } catch (e) {
-  assert(false, "tools/list: all 9 tools registered", e.message);
+  assert(false, "tools/list: all 14 tools registered", e.message);
 }
 
 // ── projects ─────────────────────────────────────────────────────────────────
@@ -220,6 +225,76 @@ try {
   );
 } catch (e) {
   assert(false, "sessions(today): does not error", e.message);
+}
+
+// ── diff ─────────────────────────────────────────────────────────────────────
+console.log(Y("\ndiff"));
+try {
+  const res = await client.tool("diff", { project: "nexus", since: "7d" });
+  const text = getText(res);
+  assert(
+    !isError(res),
+    "diff(project=nexus, since=7d): does not error",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "diff(project=nexus, since=7d): does not error", e.message);
+}
+
+// ── streak ───────────────────────────────────────────────────────────────────
+console.log(Y("\nstreak"));
+try {
+  const res = await client.tool("streak");
+  const text = getText(res);
+  assert(
+    !isError(res) && text.length > 0,
+    "streak: returns non-empty output",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "streak: returns non-empty output", e.message);
+}
+
+// ── stale ─────────────────────────────────────────────────────────────────────
+console.log(Y("\nstale"));
+try {
+  const res = await client.tool("stale");
+  const text = getText(res);
+  assert(
+    !isError(res) && text.length > 0,
+    "stale: returns non-empty output",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "stale: returns non-empty output", e.message);
+}
+
+// ── tag ───────────────────────────────────────────────────────────────────────
+console.log(Y("\ntag"));
+try {
+  const res = await client.tool("tag", { label: "test-tag" });
+  const text = getText(res);
+  assert(
+    isError(res) && text.includes("not inside a tracked project"),
+    "tag outside project: returns expected error",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "tag outside project: returns expected error", e.message);
+}
+
+// ── deps ──────────────────────────────────────────────────────────────────────
+console.log(Y("\ndeps"));
+try {
+  const res = await client.tool("deps");
+  const text = getText(res);
+  assert(
+    !isError(res) && text.length > 0,
+    "deps: returns non-empty output",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "deps: returns non-empty output", e.message);
 }
 
 // ── report ───────────────────────────────────────────────────────────────────
