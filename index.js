@@ -227,6 +227,20 @@ server.tool(
   async () => nexusTool(["streak"])
 );
 
+// 12. stale — list stale branches and dirty projects
+server.tool(
+  "stale",
+  "List stale branches and dirty projects. Use --cleanup for interactive cleanup.",
+  {
+    cleanup: z.boolean().optional().describe("Enable interactive branch cleanup"),
+  },
+  async ({ cleanup }) => {
+    const args = ["stale"];
+    if (cleanup) args.push("--cleanup");
+    return nexusTool(args);
+  }
+);
+
 // ─── Start ───────────────────────────────────────────────────────────────────
 
 const transport = new StdioServerTransport();

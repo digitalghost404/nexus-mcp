@@ -156,16 +156,17 @@ try {
     "search",
     "sessions",
     "show",
+    "stale",
     "streak",
     "where",
   ];
   assert(
     JSON.stringify(toolNames) === JSON.stringify(expected),
-    "tools/list: all 11 tools registered",
+    "tools/list: all 12 tools registered",
     `got: [${toolNames.join(", ")}]`
   );
 } catch (e) {
-  assert(false, "tools/list: all 11 tools registered", e.message);
+  assert(false, "tools/list: all 12 tools registered", e.message);
 }
 
 // ── projects ─────────────────────────────────────────────────────────────────
@@ -250,6 +251,20 @@ try {
   );
 } catch (e) {
   assert(false, "streak: returns non-empty output", e.message);
+}
+
+// ── stale ─────────────────────────────────────────────────────────────────────
+console.log(Y("\nstale"));
+try {
+  const res = await client.tool("stale");
+  const text = getText(res);
+  assert(
+    !isError(res) && text.length > 0,
+    "stale: returns non-empty output",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "stale: returns non-empty output", e.message);
 }
 
 // ── report ───────────────────────────────────────────────────────────────────
