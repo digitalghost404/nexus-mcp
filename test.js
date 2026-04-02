@@ -148,6 +148,7 @@ try {
   const toolNames = tools.map((t) => t.name).sort();
   const expected = [
     "context",
+    "deps",
     "diff",
     "note",
     "projects",
@@ -158,15 +159,16 @@ try {
     "show",
     "stale",
     "streak",
+    "tag",
     "where",
   ];
   assert(
     JSON.stringify(toolNames) === JSON.stringify(expected),
-    "tools/list: all 12 tools registered",
+    "tools/list: all 14 tools registered",
     `got: [${toolNames.join(", ")}]`
   );
 } catch (e) {
-  assert(false, "tools/list: all 12 tools registered", e.message);
+  assert(false, "tools/list: all 14 tools registered", e.message);
 }
 
 // ── projects ─────────────────────────────────────────────────────────────────
@@ -265,6 +267,34 @@ try {
   );
 } catch (e) {
   assert(false, "stale: returns non-empty output", e.message);
+}
+
+// ── tag ───────────────────────────────────────────────────────────────────────
+console.log(Y("\ntag"));
+try {
+  const res = await client.tool("tag", { label: "test-tag" });
+  const text = getText(res);
+  assert(
+    isError(res) && text.includes("not inside a tracked project"),
+    "tag outside project: returns expected error",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "tag outside project: returns expected error", e.message);
+}
+
+// ── deps ──────────────────────────────────────────────────────────────────────
+console.log(Y("\ndeps"));
+try {
+  const res = await client.tool("deps");
+  const text = getText(res);
+  assert(
+    !isError(res) && text.length > 0,
+    "deps: returns non-empty output",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "deps: returns non-empty output", e.message);
 }
 
 // ── report ───────────────────────────────────────────────────────────────────

@@ -241,6 +241,36 @@ server.tool(
   }
 );
 
+// 13. tag — add user tag to a session
+server.tool(
+  "tag",
+  "Add a user tag to a session. Without session ID, tags the latest session.",
+  {
+    label: z.string().describe("Tag label to add"),
+    sessionId: z.string().optional().describe("Session ID to tag"),
+  },
+  async ({ label, sessionId }) => {
+    const args = ["tag"];
+    if (sessionId) args.push(sessionId);
+    args.push(label);
+    return nexusTool(args);
+  }
+);
+
+// 14. deps — scan for outdated dependencies
+server.tool(
+  "deps",
+  "Scan tracked projects for outdated Go, npm, and pip dependencies.",
+  {
+    project: z.string().optional().describe("Project to check"),
+  },
+  async ({ project }) => {
+    const args = ["deps"];
+    if (project) args.push("--project", project);
+    return nexusTool(args);
+  }
+);
+
 // ─── Start ───────────────────────────────────────────────────────────────────
 
 const transport = new StdioServerTransport();
