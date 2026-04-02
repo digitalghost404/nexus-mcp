@@ -148,6 +148,7 @@ try {
   const toolNames = tools.map((t) => t.name).sort();
   const expected = [
     "context",
+    "diff",
     "note",
     "projects",
     "report",
@@ -159,7 +160,7 @@ try {
   ];
   assert(
     JSON.stringify(toolNames) === JSON.stringify(expected),
-    "tools/list: all 9 tools registered",
+    "tools/list: all 10 tools registered",
     `got: [${toolNames.join(", ")}]`
   );
 } catch (e) {
@@ -220,6 +221,20 @@ try {
   );
 } catch (e) {
   assert(false, "sessions(today): does not error", e.message);
+}
+
+// ── diff ─────────────────────────────────────────────────────────────────────
+console.log(Y("\ndiff"));
+try {
+  const res = await client.tool("diff", { project: "nexus", since: "7d" });
+  const text = getText(res);
+  assert(
+    !isError(res),
+    "diff(project=nexus, since=7d): does not error",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "diff(project=nexus, since=7d): does not error", e.message);
 }
 
 // ── report ───────────────────────────────────────────────────────────────────

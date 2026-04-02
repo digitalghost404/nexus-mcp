@@ -203,6 +203,22 @@ server.tool(
   }
 );
 
+// 10. diff — summarize changes across sessions
+server.tool(
+  "diff",
+  "Summarize changes (commits, files changed) across sessions in a time window",
+  {
+    project: z.string().optional().describe("Project name to filter by"),
+    since: z.string().optional().describe("Time window (e.g. '7d', '24h', '1m')"),
+  },
+  async ({ project, since }) => {
+    const args = ["diff"];
+    if (project) args.push(project);
+    if (since) args.push("--since", since);
+    return nexusTool(args);
+  }
+);
+
 // ─── Start ───────────────────────────────────────────────────────────────────
 
 const transport = new StdioServerTransport();
