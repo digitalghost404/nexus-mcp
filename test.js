@@ -156,15 +156,16 @@ try {
     "search",
     "sessions",
     "show",
+    "streak",
     "where",
   ];
   assert(
     JSON.stringify(toolNames) === JSON.stringify(expected),
-    "tools/list: all 10 tools registered",
+    "tools/list: all 11 tools registered",
     `got: [${toolNames.join(", ")}]`
   );
 } catch (e) {
-  assert(false, "tools/list: all 9 tools registered", e.message);
+  assert(false, "tools/list: all 11 tools registered", e.message);
 }
 
 // ── projects ─────────────────────────────────────────────────────────────────
@@ -235,6 +236,20 @@ try {
   );
 } catch (e) {
   assert(false, "diff(project=nexus, since=7d): does not error", e.message);
+}
+
+// ── streak ───────────────────────────────────────────────────────────────────
+console.log(Y("\nstreak"));
+try {
+  const res = await client.tool("streak");
+  const text = getText(res);
+  assert(
+    !isError(res) && text.length > 0,
+    "streak: returns non-empty output",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "streak: returns non-empty output", e.message);
 }
 
 // ── report ───────────────────────────────────────────────────────────────────

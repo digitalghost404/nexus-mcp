@@ -219,6 +219,14 @@ server.tool(
   }
 );
 
+// 11. streak — show coding streak
+server.tool(
+  "streak",
+  "Show consecutive days with sessions, plus weekly activity bars",
+  {},
+  async () => nexusTool(["streak"])
+);
+
 // ─── Start ───────────────────────────────────────────────────────────────────
 
 const transport = new StdioServerTransport();

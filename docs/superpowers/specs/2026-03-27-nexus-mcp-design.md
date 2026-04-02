@@ -11,7 +11,7 @@ Wrap the `nexus` CLI binary as an MCP server so OpenCode gets native tool access
 - Executes `nexus` binary via `child_process.execFile`
 - Stdio transport (standard MCP pattern)
 
-## Tools (10)
+## Tools (11)
 
 | Tool | CLI Command | Parameters | Purpose |
 |------|------------|------------|---------|
@@ -25,6 +25,7 @@ Wrap the `nexus` CLI binary as an MCP server so OpenCode gets native tool access
 | `show` | `nexus show <project>` | `project: string` | Detailed project info |
 | `sessions` | `nexus sessions` | `project?: string, since?: string, today?: boolean, tag?: string` | Session history |
 | `diff` | `nexus diff` | `project?: string, since?: string` | Summarize changes across sessions |
+| `streak` | `nexus streak` | none | Show consecutive days with sessions, plus weekly activity bars |
 
 ## Configuration
 
