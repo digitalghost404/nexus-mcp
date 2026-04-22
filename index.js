@@ -17,6 +17,11 @@ const TIMEOUT_MS = 30_000;
 
 function runNexus(args, opts = {}) {
   return new Promise((resolve) => {
+    const agent = process.env.NEXUS_AGENT;
+    if (agent && !args.includes("--agent")) {
+      args = ["--agent", agent, ...args];
+    }
+
     execFile(NEXUS_BIN, args, { timeout: TIMEOUT_MS, ...opts }, (err, stdout, stderr) => {
       if (err) {
         // Binary not found
@@ -267,6 +272,84 @@ server.tool(
   async ({ project }) => {
     const args = ["deps"];
     if (project) args.push("--project", project);
+    return nexusTool(args);
+  }
+);
+
+// 15. recall — semantic search
+server.tool(
+  "recall",
+  "Semantic search across sessions, notes, and preferences",
+  {
+    query: z.string().describe("Search query"),
+    limit: z.number().optional().default(5).describe("Maximum results"),
+    types: z
+      .array(z.string())
+      .optional()
+      .default(["session", "note", "preference"])
+      .describe("Result types to search"),
+    project: z.string().optional().describe("Project scope"),
+  },
+  async ({ query, limit, types, project }) => {
+    const args = ["recall", query, "--limit", String(limit)];
+    if (project) args.push("--project", project);
+    args.push("--types", types.join(","));
+    return nexusTool(args);
+  }
+);
+
+// 16. remember — save a preference
+server.tool(
+  "remember",
+  "Save a preference, decision, or pattern for future sessions",
+  {
+    content: z.string().describe("The preference or pattern to remember"),
+    category: z
+      .enum(["workflow", "style", "tool", "preference", "pattern"])
+      .optional()
+      .default("preference"),
+    source: z
+      .enum(["stated", "observed", "inferred"])
+      .optional()
+      .default("stated"),
+    project: z.string().optional().describe("Project scope (optional)"),
+  },
+  async ({ content, category, source, project }) => {
+    const args = ["remember", content, "--category", category, "--source", source];
+    if (project) args.push("--project", project);
+    return nexusTool(args);
+  }
+);
+
+// 17. preferences — read preferences
+server.tool(
+  "preferences",
+  "Read preferences and patterns for a project or globally",
+  {
+    project: z.string().optional().describe("Project scope (optional, omits for global)"),
+    category: z
+      .enum(["workflow", "style", "tool", "preference", "pattern"])
+      .optional(),
+  },
+  async ({ project, category }) => {
+    const args = ["preferences"];
+    if (project) args.push("--project", project);
+    if (category) args.push("--category", category);
+    return nexusTool(args);
+  }
+);
+
+// 18. inject — smart context injection
+server.tool(
+  "inject",
+  "Build smart context for session start or mid-session project switch",
+  {
+    project: z.string().describe("Project name"),
+    task_description: z.string().optional().describe("What the user seems to be working on"),
+  },
+  async ({ project, task_description }) => {
+    const args = ["inject", project];
+    if (task_description) args.push("--task", task_description);
     return nexusTool(args);
   }
 );

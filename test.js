@@ -150,8 +150,12 @@ try {
     "context",
     "deps",
     "diff",
+    "inject",
     "note",
+    "preferences",
     "projects",
+    "recall",
+    "remember",
     "report",
     "resume",
     "search",
@@ -164,7 +168,7 @@ try {
   ];
   assert(
     JSON.stringify(toolNames) === JSON.stringify(expected),
-    "tools/list: all 14 tools registered",
+    "tools/list: all 18 tools registered",
     `got: [${toolNames.join(", ")}]`
   );
 } catch (e) {
@@ -406,6 +410,83 @@ try {
   );
 } catch (e) {
   assert(false, "context(invalid): returns error for nonexistent project", e.message);
+}
+
+// ── recall ───────────────────────────────────────────────────────────────────
+console.log(Y("\nrecall"));
+try {
+  const res = await client.tool("recall", { query: "nexus", limit: 3 });
+  const text = getText(res);
+  assert(
+    !isError(res),
+    "recall: does not error for 'nexus' query",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "recall: does not error for 'nexus' query", e.message);
+}
+
+// ── remember ─────────────────────────────────────────────────────────────────
+console.log(Y("\nremember"));
+try {
+  const res = await client.tool("remember", {
+    content: "Use conventional commits for all changes",
+    category: "workflow",
+    source: "stated",
+  });
+  const text = getText(res);
+  assert(
+    !isError(res),
+    "remember: saves a preference without error",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "remember: saves a preference without error", e.message);
+}
+
+// ── preferences (no project) ────────────────────────────────────────────────
+console.log(Y("\npreferences (global)"));
+try {
+  const res = await client.tool("preferences");
+  const text = getText(res);
+  assert(
+    !isError(res),
+    "preferences(global): returns output without error",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "preferences(global): returns output without error", e.message);
+}
+
+// ── preferences (with project) ──────────────────────────────────────────────
+console.log(Y("\npreferences (with project)"));
+try {
+  const res = await client.tool("preferences", { project: "nexus" });
+  const text = getText(res);
+  assert(
+    !isError(res),
+    "preferences(project=nexus): returns output without error",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "preferences(project=nexus): returns output without error", e.message);
+}
+
+// ── inject ───────────────────────────────────────────────────────────────────
+console.log(Y("\ninject"));
+try {
+  const res = await client.tool("inject", {
+    project: "nexus",
+    task_description: "adding MCP tools for persistent memory",
+  });
+  const text = getText(res);
+  assert(
+    !isError(res),
+    "inject(project=nexus): returns output without error",
+    text.slice(0, 100)
+  );
+} catch (e) {
+  assert(false, "inject(project=nexus): returns output without error", e.message);
 }
 
 // ─── Cleanup & Report ────────────────────────────────────────────────────────
